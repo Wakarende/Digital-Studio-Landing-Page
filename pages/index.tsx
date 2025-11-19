@@ -9,6 +9,7 @@ const DigitalStudioLanding = () => {
     message: "",
     budget: 50,
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -162,6 +163,29 @@ const DigitalStudioLanding = () => {
     }
   };
 
+  const handleMobileNavClick = (e) => {
+    handleSmoothScroll(e);
+    setIsMobileMenuOpen(false);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const budgetMin = 10;
+  const budgetMax = 100;
+  const budgetValue = Number(formData.budget);
+  const budgetFillPercent =
+    ((budgetValue - budgetMin) / (budgetMax - budgetMin)) * 100;
+  const budgetSliderBackground = `linear-gradient(to right, #C6FF00 ${budgetFillPercent}%, #262626 ${budgetFillPercent}%)`;
+
   return (
     <div className="bg-[#1A1A1A] text-gray-300 min-h-screen font-sans">
       <style>
@@ -211,7 +235,7 @@ const DigitalStudioLanding = () => {
       </style>
       {toast.show && (
         <div
-          className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 flex items-center transition-all duration-300 ${
+          className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-60 flex items-center transition-all duration-300 ${
             toast.type === "success"
               ? "bg-lime-500 text-black"
               : toast.type === "error"
@@ -291,7 +315,7 @@ const DigitalStudioLanding = () => {
       )}
 
       <nav
-        className={`py-4 px-8 flex justify-between items-center border-b transition-all duration-300 z-50 ${
+        className={`relative py-4 px-8 flex justify-between items-center border-b transition-all duration-300 z-50 ${
           isScrolled
             ? "fixed top-0 left-0 right-0 w-full bg-[#1A1A1A]/95 backdrop-blur-sm shadow-lg border-[#262626]/50"
             : "bg-[#1A1A1A] border-[#262626]"
@@ -350,11 +374,101 @@ const DigitalStudioLanding = () => {
           </div>
           <a
             href="#contact"
-            className="bg-lime-400 hover:bg-lime-500 text-black px-6 py-3 rounded-md font-medium transition-colors"
+            className="hidden md:inline-flex bg-lime-400 hover:bg-lime-500 text-black px-6 py-3 rounded-md font-medium transition-colors"
             onClick={handleSmoothScroll}
           >
             Contact Us
           </a>
+          <button
+            className="ml-4 md:hidden text-white focus:outline-none"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
+        <div
+          className={`md:hidden absolute left-0 right-0 top-full origin-top transition-all duration-300 ${
+            isMobileMenuOpen
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}
+        >
+          <div className="bg-[#1A1A1A] border-t border-[#262626] px-8 py-6 flex flex-col space-y-4">
+            <a
+              href="#home"
+              className="px-3 py-2 rounded hover:bg-[#262626] text-white transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              Home
+            </a>
+            <a
+              href="#services"
+              className="px-3 py-2 rounded hover:bg-[#262626] text-white transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              Services
+            </a>
+            <a
+              href="#about"
+              className="px-3 py-2 rounded hover:bg-[#262626] text-white transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              About
+            </a>
+            <a
+              href="#clients"
+              className="px-3 py-2 rounded hover:bg-[#262626] text-white transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              Testimonials
+            </a>
+            <a
+              href="#faq"
+              className="px-3 py-2 rounded hover:bg-[#262626] text-white transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              FAQ
+            </a>
+            <a
+              href="#contact"
+              className="bg-lime-400 hover:bg-lime-500 text-black px-6 py-3 rounded-md font-medium text-center transition-colors"
+              onClick={handleMobileNavClick}
+            >
+              Contact Us
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -2105,18 +2219,20 @@ const DigitalStudioLanding = () => {
 
               <div className="mb-8">
                 <label className="block text-gray-300 mb-4">Your Budget</label>
+
                 <input
                   type="range"
-                  min="10"
-                  max="100"
+                  min={budgetMin}
+                  max={budgetMax}
                   name="budget"
-                  value={formData.budget}
+                  value={budgetValue}
                   onChange={handleInputChange}
-                  className="w-full h-2 bg-[#262626] rounded-lg appearance-none cursor-pointer accent-lime-400"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-lime-400"
+                  style={{ background: budgetSliderBackground }}
                 />
                 <div className="flex justify-between text-gray-400 text-sm mt-2">
                   <span>$10k</span>
-                  <span>${formData.budget}k</span>
+                  <span>${budgetValue}k</span>
                   <span>$100k+</span>
                 </div>
               </div>
